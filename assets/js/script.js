@@ -10,8 +10,8 @@ const imageUrls = [
 
 const config = {
 	type: Phaser.AUTO,
-	width: 500,
-	height: 500,
+	width: "100%",
+	height: "100%",
 	parent: "game",
 	scene: {
 		preload: preload,
@@ -29,6 +29,11 @@ const config = {
 
 const game = new Phaser.Game(config);
 
+window.addEventListener("resize", () => {
+	let parent = game.canvas.parentElement;
+	game.scale.resize(parent.clientWidth, parent.clientHeight);
+});
+
 function preload() {
 	for (let i = 0; i < imageUrls.length; i++) {
 		this.load.image("image" + i, imageUrls[i]);
@@ -37,7 +42,13 @@ function preload() {
 
 function create() {
 	// Créer une plateforme invisible qui couvre toute la largeur du canvas
-	this.ground = this.matter.add.rectangle(250, 505, 500, 10, { isStatic: true });
+	this.ground = this.matter.add.rectangle(
+		game.scale.width / 2,
+		game.scale.height,
+		game.scale.width,
+		10,
+		{ isStatic: true },
+	);
 
 	// Désactiver l'affichage des zones de collision
 	this.matter.world.createDebugGraphic().setVisible(false);
@@ -57,11 +68,11 @@ function dropImage(scene) {
 	const imageKey = "image" + Phaser.Math.Between(0, imageUrls.length - 1);
 
 	// Générer une position x aléatoire pour l'image
-	const x = Phaser.Math.Between(0, 480);
+	const x = Phaser.Math.Between(0, game.scale.width - 50);
 
 	// Créer un nouvel objet d'image et l'ajouter à la scène
 	const image = scene.matter.add.image(x, 0, imageKey);
 	image.setRectangle(); // Utiliser une forme rectangulaire pour la collision
 	image.setFrictionAir(0.01); // Ajouter une petite quantité de friction à l'air pour ralentir la rotation
-	image.setScale(0.1); // Ajuster la taille de l'image
+	image.setScale(0.25); // Ajuster la taille de l'image
 }
